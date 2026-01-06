@@ -1,0 +1,15 @@
+[package]
+name = "rf-contrib-sdk-httpclient"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF contrib SDK - Enhanced HTTP client"
+
+[dependencies]
+reqwest = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+rand = { workspace = true }
+rf-errors = { path = "../../../errors" }
+

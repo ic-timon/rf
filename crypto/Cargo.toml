@@ -1,0 +1,24 @@
+[package]
+name = "rf-crypto"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF crypto module - encryption and hashing"
+
+[dependencies]
+ring = { workspace = true }
+aes-gcm = { workspace = true }
+sha2 = { workspace = true }
+sha1 = { workspace = true }
+md-5 = { workspace = true }
+rsa = { workspace = true, features = ["sha2"] }
+rand = { workspace = true }
+hmac = { workspace = true }
+crc32fast = { workspace = true }
+des = "0.8"
+cipher = "0.4"
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+

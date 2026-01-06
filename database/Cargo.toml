@@ -1,0 +1,20 @@
+[package]
+name = "rf-database"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF database module - ORM and database operations"
+
+[dependencies]
+sqlx = { workspace = true }
+deadpool = { workspace = true }
+redis = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+moka = { workspace = true }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+

@@ -1,0 +1,18 @@
+[package]
+name = "rf-contrib-trace"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF distributed tracing support with OpenTelemetry"
+
+[dependencies]
+rf-errors = { path = "../../errors" }
+opentelemetry = { workspace = true }
+opentelemetry-otlp = { workspace = true }
+opentelemetry_sdk = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+axum = { workspace = true }
+

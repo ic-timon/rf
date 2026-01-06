@@ -1,0 +1,20 @@
+[package]
+name = "rf-contrib-grpc"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF gRPC framework - gRPC server and client encapsulation"
+
+[dependencies]
+tonic = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+opentelemetry = { workspace = true }
+opentelemetry-otlp = { workspace = true }
+rf-errors = { path = "../../errors" }
+rf-contrib-registry = { path = "../registry" }
+

@@ -1,0 +1,24 @@
+[package]
+name = "rf-util"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF util module - utility functions"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+chrono = { workspace = true, features = ["serde", "clock"] }
+rand = { workspace = true }
+uuid = { workspace = true }
+regex = { workspace = true }
+validator = { workspace = true }
+once_cell = { workspace = true }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+parking_lot = { workspace = true }
+moka = { workspace = true }
+rf-encoding = { path = "../encoding" }
+

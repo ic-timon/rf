@@ -1,0 +1,24 @@
+[package]
+name = "rf-container"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF container module - data structures"
+
+[dependencies]
+dashmap = { workspace = true }
+crossbeam = { workspace = true }
+indexmap = { workspace = true }
+smallvec = { workspace = true }
+ringbuf = { workspace = true }
+parking_lot = { workspace = true }
+arc-swap = { workspace = true }
+id_tree = { workspace = true }
+deadpool = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+

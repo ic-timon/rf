@@ -1,0 +1,15 @@
+[package]
+name = "rf-i18n"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF i18n module - internationalization"
+
+[dependencies]
+fluent = { workspace = true }
+tokio = { workspace = true, features = ["sync"] }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+

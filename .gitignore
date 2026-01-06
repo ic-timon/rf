@@ -1,0 +1,57 @@
+# Rust
+/target/
+**/target/
+**/*.rs.bak
+# 对于 workspace 项目，根目录的 Cargo.lock 应该提交
+# 但子项目的 Cargo.lock 不需要
+**/Cargo.lock
+!/Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+.dev/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 编译产物
+*.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 测试和文档
+/doc/
+*.orig
+
+# 日志
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+/tmp/
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 备份文件
+*.bak
+*.backup
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# 开发目录
+.dev/
+
+# AI 工具配置（个人配置，不应提交）
+.claude/
+.cursor/
+

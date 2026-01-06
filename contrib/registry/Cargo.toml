@@ -1,0 +1,21 @@
+[package]
+name = "rf-contrib-registry"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF contrib registry module - service registry and discovery"
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+reqwest = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+rf-core = { path = "../../core" }
+rf-errors = { path = "../../errors" }
+rf-os = { path = "../../os" }
+base64 = { workspace = true }
+futures = "0.3"
+
