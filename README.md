@@ -210,9 +210,11 @@ validator.validate(&data)?;
 
 ## 文档
 
-- [API 文档](https://docs.rs/rf)
-- [使用示例](examples/)
-- [迁移指南](docs/migration.md)
+- [快速开始指南](docs/QUICKSTART.md) - 5 分钟快速上手 RF 框架
+- [文档索引](docs/INDEX.md) - 所有模块的完整文档和学习路径
+- [核心模块文档](docs/core/README.md) - 核心类型和 Trait
+- [网络模块文档](docs/net/README.md) - HTTP 服务器和客户端
+- [数据库模块文档](docs/database/README.md) - ORM 和数据库操作
 
 ## 贡献
 
@@ -224,5 +226,24 @@ MIT License
 
 ## 相关链接
 
-- [GoFrame 原项目](https://github.com/gogf/gf)
+### 项目相关
+- [GitHub 仓库](https://github.com/ic-timon/rf)
+- [GoFrame 原项目](https://github.com/gogf/gf) - GoFrame 是 RF 框架的灵感来源
+
+### Rust 生态
 - [Rust 官网](https://www.rust-lang.org/)
+- [Rust 官方文档](https://doc.rust-lang.org/)
+- [Crates.io](https://crates.io/) - Rust 包仓库
+
+### 核心依赖
+- [Tokio](https://tokio.rs/) - 异步运行时
+- [Axum](https://github.com/tokio-rs/axum) - Web 应用框架
+- [SQLx](https://github.com/launchbadge/sqlx) - 异步 SQL 工具包
+- [Serde](https://serde.rs/) - 序列化框架
+- [Tonic](https://github.com/hyperium/tonic) - gRPC 实现
+
+### 工具和库
+- [OpenTelemetry](https://opentelemetry.io/) - 可观测性框架
+- [Tower](https://github.com/tower-rs/tower) - 中间件库
+- [Tracing](https://github.com/tokio-rs/tracing) - 结构化日志和追踪
+- [Deadpool](https://github.com/bikeshedder/deadpool) - 连接池管理
