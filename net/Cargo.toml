@@ -1,0 +1,39 @@
+[package]
+name = "rf-net"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF net module - network functionality"
+
+[dependencies]
+axum = { workspace = true, features = ["ws", "multipart"] }
+reqwest = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+hyper = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true, features = ["limit", "compression-gzip", "compression-br", "timeout"] }
+axum-extra = { workspace = true }
+tokio-tungstenite = { workspace = true }
+tonic = { workspace = true }
+ipnet = { workspace = true }
+trust-dns-resolver = { workspace = true }
+opentelemetry = { workspace = true }
+opentelemetry-otlp = { workspace = true }
+opentelemetry_sdk = { workspace = true }
+tracing-opentelemetry = "0.22"
+tracing-subscriber = { workspace = true }
+utoipa = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+futures-util = "0.3"
+regex = { workspace = true }
+moka = { workspace = true }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+rf-encoding = { path = "../encoding" }
+rf-contrib-registry = { path = "../contrib/registry" }
+

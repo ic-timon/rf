@@ -1,0 +1,150 @@
+[workspace]
+members = [
+    "core",
+    "container",
+    "os",
+    "net",
+    "database",
+    "encoding",
+    "crypto",
+    "util",
+    "errors",
+    "text",
+    "i18n",
+    "debug",
+    "test",
+    "frame",
+    "contrib/config",
+    "contrib/registry",
+    "contrib/sdk/httpclient",
+    "contrib/drivers",
+    "contrib/grpc",
+    "contrib/trace",
+    "cmd/rf",
+]
+
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["rf contributors"]
+license = "MIT"
+repository = "https://github.com/gogf/rf"
+
+[workspace.dependencies]
+# 错误处理
+anyhow = "1.0"
+thiserror = "1.0"
+
+# 异步运行时
+tokio = { version = "1.35", features = ["full"] }
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# 日志
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# 时间
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# 配置
+config = "0.14"
+
+# 容器
+dashmap = "5.5"
+crossbeam = "0.8"
+indexmap = "2.1"
+smallvec = "1.11"
+ringbuf = "0.4"
+parking_lot = "0.12"
+arc-swap = "1.6"
+
+# 网络
+axum = "0.7"
+reqwest = { version = "0.11", features = ["json"] }
+hyper = "1.0"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["fs", "cors", "trace"] }
+axum-extra = "0.9"
+tokio-tungstenite = "0.21"
+tonic = "0.11"
+ipnet = "2.9"
+trust-dns-resolver = "0.23"
+
+# 数据库
+sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "postgres", "mysql", "sqlite"] }
+deadpool = "0.10"
+redis = { version = "0.24", features = ["tokio-comp"] }
+
+# 编码
+toml = "0.8"
+quick-xml = { version = "0.31", features = ["serialize"] }
+ini = "1.3"
+base64 = "0.21"
+url = "2.5"
+encoding_rs = "0.8"
+flate2 = "1.0"
+zip = "0.6"
+
+# 加密
+ring = "0.17"
+aes-gcm = "0.10"
+sha2 = "0.10"
+sha1 = "0.10"
+md-5 = "0.10"
+rsa = "0.9"
+hmac = "0.12"
+crc32fast = "1.3"
+
+# 工具
+rand = "0.8"
+regex = "1.10"
+validator = "0.18"
+unicode-segmentation = "1.11"
+
+# 文件系统
+fs2 = "0.4"
+notify = "6.1"
+built = "0.7"
+sysinfo = "0.30"
+ctrlc = "3.4"
+tempfile = "3.9"
+walkdir = "2.4"
+
+# 其他
+once_cell = "1.19"
+lazy_static = "1.4"
+backtrace = "0.3"
+moka = { version = "0.12", features = ["future"] }
+tokio-cron-scheduler = "0.9"
+axum-sessions = "0.4"
+pathdiff = "0.2"
+reflect = "0.1"
+askama = "0.12"
+tera = "1.19"
+opentelemetry = "0.21"
+opentelemetry-otlp = "0.14"
+opentelemetry_sdk = "0.21"
+metrics = "0.23"
+utoipa = "4.2"
+fluent = "0.16"
+id_tree = "1.8"
+petgraph = "0.6"
+deadpool-generic = "0.10"
+byteorder = "1.5"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+twox-hash = "1.6"
+scraper = "0.19"
+html5ever = "0.26"
+des = "0.9"
+tokio-test = "0.4"
+env_logger = "0.11"
+

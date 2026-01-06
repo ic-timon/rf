@@ -1,0 +1,21 @@
+[package]
+name = "rf-contrib-config"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF contrib config module - configuration center adapters"
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+reqwest = { workspace = true }
+futures = "0.3"
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+rf-core = { path = "../../core" }
+rf-errors = { path = "../../errors" }
+rf-os = { path = "../../os" }
+base64 = { workspace = true }
+

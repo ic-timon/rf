@@ -1,0 +1,15 @@
+[package]
+name = "rf-text"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF text module - text processing"
+
+[dependencies]
+regex = { workspace = true }
+unicode-segmentation = { workspace = true }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+

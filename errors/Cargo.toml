@@ -1,0 +1,14 @@
+[package]
+name = "rf-errors"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF errors module - error codes and error handling"
+
+[dependencies]
+thiserror.workspace = true
+anyhow.workspace = true
+rf-core = { path = "../core" }
+

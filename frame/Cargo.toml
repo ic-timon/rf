@@ -1,0 +1,23 @@
+[package]
+name = "rf-frame"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RF frame module - framework instance management"
+
+[dependencies]
+tokio = { workspace = true, features = ["full"] }
+reqwest = { workspace = true }
+once_cell = { workspace = true }
+lazy_static = { workspace = true }
+rf-core = { path = "../core" }
+rf-errors = { path = "../errors" }
+rf-net = { path = "../net" }
+rf-database = { path = "../database" }
+rf-os = { path = "../os" }
+rf-util = { path = "../util" }
+rf-i18n = { path = "../i18n" }
+tracing-subscriber = { workspace = true }
+
