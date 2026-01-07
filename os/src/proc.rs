@@ -50,7 +50,7 @@ impl ProcessMonitor {
         let system = self.system.read().await;
         system.process(Pid::from(pid as usize)).map(|process| ProcessInfo {
                 pid,
-                name: process.name().to_string(),
+                name: process.name().to_string_lossy().to_string(),
                 cpu_usage: process.cpu_usage(),
                 memory_usage: process.memory(),
                 status: format!("{:?}", process.status()),
@@ -64,7 +64,7 @@ impl ProcessMonitor {
             .iter()
             .map(|(pid, process)| ProcessInfo {
                 pid: pid.as_u32(),
-                name: process.name().to_string(),
+                name: process.name().to_string_lossy().to_string(),
                 cpu_usage: process.cpu_usage(),
                 memory_usage: process.memory(),
                 status: format!("{:?}", process.status()),
@@ -77,10 +77,10 @@ impl ProcessMonitor {
         let system = self.system.read().await;
         system.processes()
             .iter()
-            .filter(|(_, process)| process.name().contains(name))
+            .filter(|(_, process)| process.name().to_string_lossy().contains(name))
             .map(|(pid, process)| ProcessInfo {
                 pid: pid.as_u32(),
-                name: process.name().to_string(),
+                name: process.name().to_string_lossy().to_string(),
                 cpu_usage: process.cpu_usage(),
                 memory_usage: process.memory(),
                 status: format!("{:?}", process.status()),

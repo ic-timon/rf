@@ -115,10 +115,17 @@ impl MetricLabels {
 
     /// Build Key from labels
     pub fn to_key(&self, name: &str) -> Key {
-        // Note: metrics::Key doesn't have a `with` method in this version
-        // Labels are handled differently - for now, just return the key with name
-        // TODO: Implement proper label support when metrics API is updated
-        Key::from_name(KeyName::from(name.to_string()))
+        // Build metric name with labels
+        // Format: name{label1=value1,label2=value2}
+        if self.labels.is_empty() {
+            Key::from_name(KeyName::from(name.to_string()))
+        } else {
+            let label_parts: Vec<String> = self.labels.iter()
+                .map(|(k, v)| format!("{}={}", k, v))
+                .collect();
+            let full_name = format!("{}{{{}}}", name, label_parts.join(","));
+            Key::from_name(KeyName::from(full_name))
+        }
     }
 
     /// Get labels as vector
@@ -134,32 +141,26 @@ impl Default for MetricLabels {
 }
 
 /// Increment counter with labels (using recorder API)
-pub fn counter_inc_with_key(_key: metrics::Key, value: u64) {
-    // Note: metrics crate API may vary by version
-    // For now, simplified implementation - labels not fully supported
-    // TODO: Implement proper label support when metrics API is updated
-    let name_str = _key.name().to_string();
-    let static_name: &'static str = Box::leak(name_str.into_boxed_str());
+pub fn counter_inc_with_key(key: metrics::Key, value: u64) {
+    // Use cached static name to avoid Box::leak
+    let name_str = key.name().to_string();
+    let static_name = get_static_name(&name_str);
     metrics::counter!(static_name).increment(value);
 }
 
 /// Set gauge with labels (using recorder API)
-pub fn gauge_set_with_key(_key: metrics::Key, value: f64) {
-    // Note: metrics crate API may vary by version
-    // For now, simplified implementation - labels not fully supported
-    // TODO: Implement proper label support when metrics API is updated
-    let name_str = _key.name().to_string();
-    let static_name: &'static str = Box::leak(name_str.into_boxed_str());
+pub fn gauge_set_with_key(key: metrics::Key, value: f64) {
+    // Use cached static name to avoid Box::leak
+    let name_str = key.name().to_string();
+    let static_name = get_static_name(&name_str);
     metrics::gauge!(static_name).set(value);
 }
 
 /// Record histogram with labels (using recorder API)
-pub fn histogram_record_with_key(_key: metrics::Key, value: f64) {
-    // Note: metrics crate API may vary by version
-    // For now, simplified implementation - labels not fully supported
-    // TODO: Implement proper label support when metrics API is updated
-    let name_str = _key.name().to_string();
-    let static_name: &'static str = Box::leak(name_str.into_boxed_str());
+pub fn histogram_record_with_key(key: metrics::Key, value: f64) {
+    // Use cached static name to avoid Box::leak
+    let name_str = key.name().to_string();
+    let static_name = get_static_name(&name_str);
     metrics::histogram!(static_name).record(value);
 }
 

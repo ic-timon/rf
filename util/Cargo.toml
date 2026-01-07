@@ -7,6 +7,17 @@ license.workspace = true
 repository.workspace = true
 description = "RF util module - utility functions"
 
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "guid_bench"
+harness = false
+
+[[bench]]
+name = "rand_bench"
+harness = false
+
 [dependencies]
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

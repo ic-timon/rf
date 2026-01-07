@@ -24,12 +24,12 @@
 //! // 创建树，根节点值为 "root"
 //! let mut tree = TreeContainer::new("root");
 //!
-//! // 获取根节点 ID
-//! let root_id = tree.root_id().unwrap();
+//! // 获取根节点 ID 并克隆
+//! let root_id = tree.root_id().unwrap().clone();
 //!
 //! // 插入子节点
-//! let child1 = tree.insert_child(root_id, "child1").unwrap();
-//! let child2 = tree.insert_child(root_id, "child2").unwrap();
+//! let child1 = tree.insert_child(&root_id, "child1").unwrap();
+//! let child2 = tree.insert_child(&root_id, "child2").unwrap();
 //! ```
 
 use id_tree::{Node, NodeId, Tree, TreeBuilder};
@@ -148,10 +148,10 @@ impl<T> TreeContainer<T> {
     /// use rf_container::TreeContainer;
     ///
     /// let mut tree = TreeContainer::new("root");
-    /// let root_id = tree.root_id().unwrap();
+    /// let root_id = tree.root_id().unwrap().clone();
     ///
     /// // 插入子节点
-    /// let child_id = tree.insert_child(root_id, "child").unwrap();
+    /// let child_id = tree.insert_child(&root_id, "child").unwrap();
     /// ```
     pub fn insert_child(&mut self, parent_id: &NodeId, data: T) -> Result<NodeId, id_tree::NodeIdError> {
         self.tree.insert(Node::new(data), id_tree::InsertBehavior::UnderNode(parent_id))

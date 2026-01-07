@@ -39,6 +39,7 @@ use rf_errors::{Result, RfError};
 /// # 示例
 ///
 /// ```rust
+/// use rf_contrib_drivers::{oceanbase::OceanBaseDriver, DatabaseDriver};
 /// let driver = OceanBaseDriver::new();
 /// let name = driver.name(); // 返回 "oceanbase"
 /// ```
@@ -54,6 +55,7 @@ impl OceanBaseDriver {
     /// # 示例
     ///
     /// ```rust
+    /// use rf_contrib_drivers::oceanbase::OceanBaseDriver;
     /// let driver = OceanBaseDriver::new();
     /// ```
     pub fn new() -> Self {

@@ -128,7 +128,8 @@ impl InstanceManager {
         F: FnOnce() -> T,
         T: 'static + Clone + Send + Sync,
     {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         if let Some(instance) = instances.get(name) {
             if let Some(typed) = instance.downcast_ref::<T>() {
                 return typed.clone();
@@ -188,7 +189,8 @@ impl InstanceManager {
     {
         // 第一次检查：只读锁，在 await 之前释放
         {
-            let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+            let instances = INSTANCE_MANAGER.instances.lock()
+                .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
             if let Some(instance) = instances.get(name) {
                 if let Some(typed) = instance.downcast_ref::<Arc<T>>() {
                     return Arc::clone(typed);
@@ -201,7 +203,8 @@ impl InstanceManager {
         let arc_instance = Arc::new(instance);
 
         // 重新获取锁以插入新实例
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.insert(name.to_string(), Box::new(Arc::clone(&arc_instance)));
         arc_instance
     }
@@ -222,7 +225,8 @@ impl InstanceManager {
     /// InstanceManager::remove("temp_instance");
     /// ```
     pub fn remove(name: &str) {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.remove(name);
     }
 
@@ -239,7 +243,8 @@ impl InstanceManager {
     /// InstanceManager::clear();
     /// ```
     pub fn clear() {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.clear();
     }
 }
@@ -282,7 +287,8 @@ pub fn server(name: Option<&str>) -> Result<Arc<rf_net::http::HttpServer>> {
     let key = format!("server.{}", instance_name);
 
     // HttpServer 未实现 Clone，因此使用 Arc
-    let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+    let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
     if let Some(instance) = instances.get(&key) {
         if let Some(typed) = instance.downcast_ref::<Arc<rf_net::http::HttpServer>>() {
             return Ok(Arc::clone(typed));
@@ -355,7 +361,8 @@ pub async fn database(name: Option<&str>) -> Result<Arc<rf_database::db::Databas
 
     // 第一次检查：只读锁，在 await 之前释放
     {
-        let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         if let Some(instance) = instances.get(&key) {
             if let Some(typed) = instance.downcast_ref::<Arc<rf_database::db::Database>>() {
                 return Ok(Arc::clone(typed));
@@ -384,7 +391,8 @@ pub async fn database(name: Option<&str>) -> Result<Arc<rf_database::db::Databas
 
     let arc_db = Arc::new(db);
     {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.insert(key, Box::new(Arc::clone(&arc_db)));
     }
     Ok(arc_db)
@@ -430,7 +438,8 @@ pub async fn redis(name: Option<&str>) -> Result<Arc<rf_database::redis::RedisCl
 
     // 第一次检查：只读锁，在 await 之前释放
     {
-        let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         if let Some(instance) = instances.get(&key) {
             if let Some(typed) = instance.downcast_ref::<Arc<rf_database::redis::RedisClient>>() {
                 return Ok(Arc::clone(typed));
@@ -451,7 +460,8 @@ pub async fn redis(name: Option<&str>) -> Result<Arc<rf_database::redis::RedisCl
 
     let arc_client = Arc::new(client);
     {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.insert(key, Box::new(Arc::clone(&arc_client)));
     }
     Ok(arc_client)
@@ -494,7 +504,8 @@ pub fn view(name: Option<&str>) -> Result<Arc<rf_os::view::View>> {
     let key = format!("view.{}", instance_name);
 
     // View 未实现 Clone，因此使用 Arc
-    let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+    let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
     if let Some(instance) = instances.get(&key) {
         if let Some(typed) = instance.downcast_ref::<Arc<rf_os::view::View>>() {
             return Ok(Arc::clone(typed));
@@ -519,7 +530,8 @@ pub fn view(name: Option<&str>) -> Result<Arc<rf_os::view::View>> {
 
     let arc_view = Arc::new(view);
     {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.insert(key, Box::new(Arc::clone(&arc_view)));
     }
     Ok(arc_view)
@@ -558,7 +570,8 @@ pub fn config(name: Option<&str>) -> Arc<rf_os::cfg::Config> {
     let key = format!("config.{}", instance_name);
 
     // Config 未实现 Clone，因此使用 Arc
-    let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+    let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
     if let Some(instance) = instances.get(&key) {
         if let Some(typed) = instance.downcast_ref::<Arc<rf_os::cfg::Config>>() {
             return Arc::clone(typed);
@@ -608,7 +621,8 @@ pub fn i18n(name: Option<&str>) -> Arc<rf_i18n::i18n::I18n> {
     let key = format!("i18n.{}", instance_name);
 
     // I18n 未实现 Clone，因此使用 Arc
-    let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+    let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
     if let Some(instance) = instances.get(&key) {
         if let Some(typed) = instance.downcast_ref::<Arc<rf_i18n::i18n::I18n>>() {
             return Arc::clone(typed);
@@ -627,7 +641,8 @@ pub fn i18n(name: Option<&str>) -> Arc<rf_i18n::i18n::I18n> {
 
     let arc_i18n = Arc::new(i18n_instance);
     {
-        let mut instances = INSTANCE_MANAGER.instances.lock().unwrap();
+        let mut instances = INSTANCE_MANAGER.instances.lock()
+            .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
         instances.insert(key, Box::new(Arc::clone(&arc_i18n)));
     }
     arc_i18n
@@ -663,7 +678,8 @@ pub fn resource(name: Option<&str>) -> Arc<rf_os::res::ResourceStorage> {
     let key = format!("resource.{}", instance_name);
 
     // ResourceStorage 未实现 Clone，因此使用 Arc
-    let instances = INSTANCE_MANAGER.instances.lock().unwrap();
+    let instances = INSTANCE_MANAGER.instances.lock()
+        .expect("Mutex poisoned in InstanceManager - this should not happen in normal operation");
     if let Some(instance) = instances.get(&key) {
         if let Some(typed) = instance.downcast_ref::<Arc<rf_os::res::ResourceStorage>>() {
             return Arc::clone(typed);

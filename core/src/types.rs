@@ -24,7 +24,7 @@
 //! # 使用示例
 //!
 //! ```rust
-//! use rframe_core::{Map, MapStrStr, List, Var};
+//! use rf_core::{Map, MapStrStr, List, Var};
 //! use serde_json::json;
 //!
 //! // 创建一个 Map (String -> Value)
@@ -64,7 +64,7 @@ use serde_json::Value;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::Map;
+/// use rf_core::Map;
 /// use serde_json::json;
 ///
 /// let mut config: Map = Map::new();
@@ -81,7 +81,7 @@ pub type Map = std::collections::HashMap<String, Value>;
 /// # 使用示例
 ///
 /// ```rust
-/// use rframe_core::MapAnyAny;
+/// use rf_core::MapAnyAny;
 /// use serde_json::json;
 ///
 /// let mut data: MapAnyAny = MapAnyAny::new();
@@ -103,7 +103,7 @@ pub type MapAnyAny = std::collections::HashMap<String, Value>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapAnyStr;
+/// use rf_core::MapAnyStr;
 ///
 /// let mut labels: MapAnyStr = MapAnyStr::new();
 /// labels.insert("title".to_string(), "用户管理".to_string());
@@ -124,7 +124,7 @@ pub type MapAnyStr = std::collections::HashMap<String, String>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapAnyInt;
+/// use rf_core::MapAnyInt;
 ///
 /// let mut counters: MapAnyInt = MapAnyInt::new();
 /// counters.insert("views".to_string(), 1000);
@@ -144,7 +144,7 @@ pub type MapStrAny = std::collections::HashMap<String, Value>;
 /// # 使用示例
 ///
 /// ```rust
-/// use rframe_core::MapStrStr;
+/// use rf_core::MapStrStr;
 ///
 /// let mut headers: MapStrStr = MapStrStr::new();
 /// headers.insert("Content-Type".to_string(), "application/json".to_string());
@@ -170,7 +170,7 @@ pub type MapStrInt = std::collections::HashMap<String, i64>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapIntAny;
+/// use rf_core::MapIntAny;
 /// use serde_json::json;
 ///
 /// let mut indexed_data: MapIntAny = MapIntAny::new();
@@ -191,7 +191,7 @@ pub type MapIntAny = std::collections::HashMap<i64, Value>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapIntStr;
+/// use rf_core::MapIntStr;
 ///
 /// let mut error_messages: MapIntStr = MapIntStr::new();
 /// error_messages.insert(404, "未找到".to_string());
@@ -211,7 +211,7 @@ pub type MapIntStr = std::collections::HashMap<i64, String>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapIntInt;
+/// use rf_core::MapIntInt;
 ///
 /// let mut mapping: MapIntInt = MapIntInt::new();
 /// mapping.insert(1, 100);
@@ -232,7 +232,7 @@ pub type MapIntInt = std::collections::HashMap<i64, i64>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapAnyBool;
+/// use rf_core::MapAnyBool;
 ///
 /// let mut features: MapAnyBool = MapAnyBool::new();
 /// features.insert("dark_mode".to_string(), true);
@@ -257,7 +257,7 @@ pub type MapStrBool = std::collections::HashMap<String, bool>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::MapIntBool;
+/// use rf_core::MapIntBool;
 ///
 /// let mut status: MapIntBool = MapIntBool::new();
 /// status.insert(1, true);
@@ -278,7 +278,7 @@ pub type MapIntBool = std::collections::HashMap<i64, bool>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::List;
+/// use rf_core::List;
 /// use serde_json::json;
 ///
 /// let mut users: List = List::new();
@@ -308,7 +308,7 @@ pub type ListAnyAny = Vec<MapAnyAny>;
 /// # 使用示例
 ///
 /// ```rust
-/// use rframe_core::ListAnyStr;
+/// use rf_core::ListAnyStr;
 ///
 /// let mut tags: ListAnyStr = ListAnyStr::new();
 ///
@@ -341,7 +341,7 @@ pub type ListStrAny = Vec<MapStrAny>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::ListStrStr;
+/// use rf_core::ListStrStr;
 ///
 /// let mut headers_list: ListStrStr = ListStrStr::new();
 ///
@@ -394,7 +394,7 @@ pub type ListIntInt = Vec<MapIntInt>;
 /// # 示例
 ///
 /// ```rust
-/// use rframe_core::Var;
+/// use rf_core::Var;
 /// use serde_json::json;
 ///
 /// // 各种类型的 Var
@@ -414,7 +414,7 @@ pub type ListIntInt = Vec<MapIntInt>;
 /// # 类型转换
 ///
 /// ```rust
-/// use rframe_core::Var;
+/// use rf_core::Var;
 /// use serde_json::json;
 ///
 /// let var: Var = json!(123);

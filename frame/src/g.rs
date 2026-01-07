@@ -167,10 +167,17 @@ pub async fn udp_socket(addr: &str) -> Result<rf_net::udp::UdpSocketWrapper> {
 /// 已弃用：使用 tcp_server 代替
 ///
 /// 这是一个遗留的函数名称，请使用 `tcp_server()` 代替。
-/// 对于 UDP 功能，请使用 `udp_socket()`。
-#[deprecated(note = "Use tcp_server() instead")]
+/// # Deprecated
+/// 
+/// **此函数已弃用。** 这是一个占位符实现，不提供真正的UDP服务器功能。
+/// 
+/// 对于UDP功能，请使用 `udp_socket()` 或直接使用 `tokio::net::UdpSocket`。
+/// 
+/// 此函数仅保留用于向后兼容，将在未来版本中移除。
+#[deprecated(note = "Use udp_socket() or tokio::net::UdpSocket instead. Will be removed in future version.")]
 pub fn udp_server(_addr: SocketAddr) -> Result<()> {
     // 已弃用：使用 udp_socket() 来实现实际的 UDP 功能
+    // Note: udp_server() is deprecated, use udp_socket() or tokio::net::UdpSocket instead
     Ok(())
 }
 

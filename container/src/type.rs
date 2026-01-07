@@ -22,7 +22,8 @@
 //! # 示例
 //!
 //! ```
-//! use rf_container::type::{Bool, Int, String};
+//! use rf_container::r#type::{Bool, Int};
+//! use rf_container::r#type::String as ThreadSafeString;
 //! use std::sync::Arc;
 //! use std::thread;
 //!
@@ -34,12 +35,12 @@
 //!     counter_clone.add(10);
 //! }).join().unwrap();
 //!
-//! println!("Counter: {}", counter.get()); // 输出: 10
+//! assert_eq!(counter.get(), 10);
 //!
 //! // 创建原子字符串
-//! let text = String::new("Hello".to_string());
+//! let text = ThreadSafeString::new("Hello".to_string());
 //! text.set("World".to_string());
-//! println!("{}", text.get()); // 输出: World
+//! assert_eq!(text.get(), "World");
 //! ```
 
 use std::sync::atomic::{AtomicBool, AtomicI32, AtomicI64, AtomicU32, AtomicU64};
@@ -56,7 +57,7 @@ use std::sync::Arc;
 /// # 示例
 ///
 /// ```
-/// use rf_container::type::Bool;
+/// use rf_container::r#type::Bool;
 ///
 /// let flag = Bool::new(false);
 /// println!("Initial: {}", flag.get()); // 输出: false
@@ -81,7 +82,7 @@ impl Bool {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Bool;
+    /// use rf_container::r#type::Bool;
     ///
     /// let flag = Bool::new(true);
     /// ```
@@ -98,7 +99,7 @@ impl Bool {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Bool;
+    /// use rf_container::r#type::Bool;
     ///
     /// let flag = Bool::new(true);
     /// assert_eq!(flag.get(), true);
@@ -116,7 +117,7 @@ impl Bool {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Bool;
+    /// use rf_container::r#type::Bool;
     ///
     /// let flag = Bool::new(false);
     /// flag.set(true);
@@ -139,7 +140,7 @@ impl Bool {
 /// # 示例
 ///
 /// ```
-/// use rf_container::type::Int;
+/// use rf_container::r#type::Int;
 ///
 /// let counter = Int::new(0);
 /// counter.add(5);
@@ -162,7 +163,7 @@ impl Int {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int;
+    /// use rf_container::r#type::Int;
     ///
     /// let num = Int::new(42);
     /// ```
@@ -179,7 +180,7 @@ impl Int {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int;
+    /// use rf_container::r#type::Int;
     ///
     /// let num = Int::new(42);
     /// assert_eq!(num.get(), 42);
@@ -197,7 +198,7 @@ impl Int {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int;
+    /// use rf_container::r#type::Int;
     ///
     /// let num = Int::new(42);
     /// num.set(100);
@@ -220,7 +221,7 @@ impl Int {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int;
+    /// use rf_container::r#type::Int;
     ///
     /// let counter = Int::new(10);
     /// let new_value = counter.add(5);
@@ -244,7 +245,7 @@ impl Int {
 /// # 示例
 ///
 /// ```
-/// use rf_container::type::Int64;
+/// use rf_container::r#type::Int64;
 ///
 /// let counter = Int64::new(0);
 /// counter.add(1_000_000);
@@ -267,7 +268,7 @@ impl Int64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int64;
+    /// use rf_container::r#type::Int64;
     ///
     /// let num = Int64::new(1_000_000);
     /// ```
@@ -284,7 +285,7 @@ impl Int64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int64;
+    /// use rf_container::r#type::Int64;
     ///
     /// let num = Int64::new(1_000_000);
     /// assert_eq!(num.get(), 1_000_000);
@@ -302,7 +303,7 @@ impl Int64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int64;
+    /// use rf_container::r#type::Int64;
     ///
     /// let num = Int64::new(1_000_000);
     /// num.set(2_000_000);
@@ -325,7 +326,7 @@ impl Int64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Int64;
+    /// use rf_container::r#type::Int64;
     ///
     /// let counter = Int64::new(1_000_000);
     /// let new_value = counter.add(500_000);
@@ -347,7 +348,7 @@ impl Int64 {
 /// # 示例
 ///
 /// ```
-/// use rf_container::type::Uint;
+/// use rf_container::r#type::Uint;
 ///
 /// let counter = Uint::new(0);
 /// counter.add(10);
@@ -370,7 +371,7 @@ impl Uint {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint;
+    /// use rf_container::r#type::Uint;
     ///
     /// let num = Uint::new(100);
     /// ```
@@ -387,7 +388,7 @@ impl Uint {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint;
+    /// use rf_container::r#type::Uint;
     ///
     /// let num = Uint::new(100);
     /// assert_eq!(num.get(), 100);
@@ -405,7 +406,7 @@ impl Uint {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint;
+    /// use rf_container::r#type::Uint;
     ///
     /// let num = Uint::new(100);
     /// num.set(200);
@@ -428,7 +429,7 @@ impl Uint {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint;
+    /// use rf_container::r#type::Uint;
     ///
     /// let counter = Uint::new(100);
     /// let new_value = counter.add(50);
@@ -450,7 +451,7 @@ impl Uint {
 /// # 示例
 ///
 /// ```
-/// use rf_container::type::Uint64;
+/// use rf_container::r#type::Uint64;
 ///
 /// let counter = Uint64::new(0);
 /// counter.add(1_000_000);
@@ -473,7 +474,7 @@ impl Uint64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint64;
+    /// use rf_container::r#type::Uint64;
     ///
     /// let num = Uint64::new(1_000_000);
     /// ```
@@ -490,7 +491,7 @@ impl Uint64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint64;
+    /// use rf_container::r#type::Uint64;
     ///
     /// let num = Uint64::new(1_000_000);
     /// assert_eq!(num.get(), 1_000_000);
@@ -508,7 +509,7 @@ impl Uint64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint64;
+    /// use rf_container::r#type::Uint64;
     ///
     /// let num = Uint64::new(1_000_000);
     /// num.set(2_000_000);
@@ -531,7 +532,7 @@ impl Uint64 {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::Uint64;
+    /// use rf_container::r#type::Uint64;
     ///
     /// let counter = Uint64::new(1_000_000);
     /// let new_value = counter.add(500_000);
@@ -554,7 +555,7 @@ impl Uint64 {
 /// # 示例
 ///
 /// ```
-/// use rf_container::type::String;
+/// use rf_container::r#type::String;
 ///
 /// let text = String::new("Hello".to_string());
 /// println!("{}", text.get()); // 输出: Hello
@@ -579,7 +580,7 @@ impl String {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::String;
+    /// use rf_container::r#type::String;
     ///
     /// let text = String::new("Hello, World!".to_string());
     /// ```
@@ -600,7 +601,7 @@ impl String {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::String;
+    /// use rf_container::r#type::String;
     ///
     /// let text = String::new("Hello".to_string());
     /// let content = text.get();
@@ -619,7 +620,7 @@ impl String {
     /// # 示例
     ///
     /// ```
-    /// use rf_container::type::String;
+    /// use rf_container::r#type::String;
     ///
     /// let text = String::new("Hello".to_string());
     /// text.set("World".to_string());

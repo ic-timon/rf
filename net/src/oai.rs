@@ -38,8 +38,6 @@
 //!
 //! 这是一个简化的实现。对于完整的 OpenAPI 支持，建议使用 utoipa 库的派生宏。
 
-use utoipa::openapi::OpenApi;
-
 /// OpenAPI 规范构建器
 ///
 /// 用于构建 OpenAPI (Swagger) 规范文档，描述 API 的接口、参数、响应等。

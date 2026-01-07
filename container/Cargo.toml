@@ -22,3 +22,35 @@ serde_json = { workspace = true }
 rf-core = { path = "../core" }
 rf-errors = { path = "../errors" }
 
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio = { workspace = true, features = ["rt"] }
+
+[[bench]]
+name = "array_bench"
+harness = false
+
+[[bench]]
+name = "list_bench"
+harness = false
+
+[[bench]]
+name = "queue_bench"
+harness = false
+
+[[bench]]
+name = "ring_bench"
+harness = false
+
+[[bench]]
+name = "pool_bench"
+harness = false
+
+[[bench]]
+name = "map_bench"
+harness = false
+
+[[bench]]
+name = "set_bench"
+harness = false
+

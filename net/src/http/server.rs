@@ -120,7 +120,7 @@ impl HttpServer {
     /// Add request timeout
     pub fn with_request_timeout(mut self, timeout: std::time::Duration) -> Self {
         use tower_http::timeout::TimeoutLayer;
-        self.router = self.router.layer(TimeoutLayer::new(timeout));
+        self.router = self.router.layer(TimeoutLayer::with_status_code(axum::http::StatusCode::REQUEST_TIMEOUT, timeout));
         self
     }
 
@@ -173,15 +173,24 @@ impl HttpServer {
             let ctrl_c = async {
                 signal::ctrl_c()
                     .await
-                    .expect("Failed to install Ctrl+C handler");
+                    .map_err(|e| {
+                        tracing::error!("Failed to install Ctrl+C handler: {}", e);
+                        rf_errors::RfError::Internal(format!("Failed to install Ctrl+C handler: {}", e))
+                    })
+                    .ok(); // Continue even if signal handler fails
             };
             
             #[cfg(unix)]
             let terminate = async {
-                signal::unix::signal(signal::unix::SignalKind::terminate())
-                    .expect("Failed to install signal handler")
-                    .recv()
-                    .await;
+                match signal::unix::signal(signal::unix::SignalKind::terminate()) {
+                    Ok(mut sig) => {
+                        sig.recv().await;
+                    }
+                    Err(e) => {
+                        tracing::error!("Failed to install signal handler: {}", e);
+                        // Continue even if signal handler fails
+                    }
+                }
             };
             
             #[cfg(not(unix))]

@@ -83,11 +83,24 @@ impl<T: Default + Send + Sync + 'static> Default for ObjectPoolManager<T> {
 /// 1. **性能**：每次都创建新对象，没有池化优势
 /// 2. **资源浪费**：不限制对象创建数量
 /// 3. **无状态管理**：不跟踪或重用对象
-#[deprecated(note = "这是一个占位符。请使用 deadpool 或 object-pool 进行生产环境开发。")]
+/// 
+/// # Deprecated
+/// 
+/// **此类型已弃用。** 这是一个占位符实现，不提供真正的对象池功能。
+/// 
+/// 对于生产环境，请使用：
+/// - [`deadpool`](https://crates.io/crates/deadpool) - 异步连接池
+/// - [`object-pool`](https://crates.io/crates/object-pool) - 通用对象池
+/// 
+/// 此类型仅保留用于向后兼容，将在未来版本中移除。
+#[deprecated(note = "这是一个占位符。请使用 deadpool 或 object-pool 进行生产环境开发。将在未来版本中移除。")]
 pub struct ObjectPool<T> {
+    #[allow(dead_code, deprecated)]
     _phantom: PhantomData<T>,
 }
 
+#[allow(deprecated)]
+#[allow(clippy::deprecated)]
 impl<T: Default + Send + Sync + 'static> ObjectPool<T> {
     /// 创建一个新的对象池
     ///
@@ -104,6 +117,7 @@ impl<T: Default + Send + Sync + 'static> ObjectPool<T> {
     /// 返回一个 `ObjectPool` 实例
     pub fn new(_max_size: usize) -> Self {
         Self {
+            #[allow(deprecated)]
             _phantom: PhantomData,
         }
     }
@@ -127,6 +141,7 @@ impl<T: Default + Send + Sync + 'static> ObjectPool<T> {
     }
 }
 
+#[allow(deprecated)]
 impl<T: Default + Send + Sync + 'static> Default for ObjectPool<T> {
     fn default() -> Self {
         Self::new(10)

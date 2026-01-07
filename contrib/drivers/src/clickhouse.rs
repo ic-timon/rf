@@ -34,9 +34,10 @@ use reqwest::Client;
 ///
 /// # 示例
 ///
-/// ```rust
+/// ```rust,no_run
+/// # use rf_contrib_drivers::clickhouse::ClickHouseDriver;
 /// let driver = ClickHouseDriver::new();
-/// let conn = driver.connect("clickhouse://default:@localhost:8123/default")?;
+/// // let conn = driver.connect("clickhouse://default:@localhost:8123/default")?;
 /// ```
 pub struct ClickHouseDriver {
     _client: Client,

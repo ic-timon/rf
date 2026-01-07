@@ -64,7 +64,10 @@ impl ZooKeeperRegistry {
     }
 
     /// Deserialize service instance from JSON
-    #[allow(dead_code)]
+    /// 
+    /// Note: This method is currently unused but kept for future implementation
+    /// when full ZooKeeper integration is completed.
+    #[allow(dead_code)] // Reserved for future use
     fn deserialize_instance(data: &str) -> Result<ServiceInstance> {
         serde_json::from_str(data)
             .map_err(|e| RfError::Internal(format!("Failed to deserialize instance: {}", e)))

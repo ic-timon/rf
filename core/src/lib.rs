@@ -17,7 +17,7 @@
 //! # 使用示例
 //!
 //! ```rust
-//! use rframe_core::{Map, List, Var};
+//! use rf_core::{Map, List, Var};
 //!
 //! // 创建一个 Map
 //! let mut map: Map = Map::new();

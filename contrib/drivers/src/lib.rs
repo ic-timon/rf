@@ -123,11 +123,15 @@ pub trait DatabaseConnection: Send + Sync {
     ///
     /// # 示例
     ///
-    /// ```rust
+    /// ```rust,no_run
+    /// # use rf_contrib_drivers::DatabaseConnection;
+    /// # fn example(connection: &dyn DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
     /// let results = connection.query("SELECT name, age FROM users", &[])?;
     /// for row in results {
     ///     println!("Name: {}, Age: {}", row[0], row[1]);
     /// }
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # 错误
@@ -153,12 +157,16 @@ pub trait DatabaseConnection: Send + Sync {
     ///
     /// # 示例
     ///
-    /// ```rust
+    /// ```rust,no_run
+    /// # use rf_contrib_drivers::DatabaseConnection;
+    /// # fn example(connection: &dyn DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
     /// let affected = connection.execute(
     ///     "UPDATE users SET age = ? WHERE id = ?",
     ///     &[&30, &1]
     /// )?;
     /// println!("Updated {} rows", affected);
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # 错误
@@ -182,13 +190,17 @@ pub trait DatabaseConnection: Send + Sync {
     ///
     /// # 示例
     ///
-    /// ```rust
+    /// ```rust,no_run
+    /// # use rf_contrib_drivers::DatabaseConnection;
+    /// # fn example(connection: &dyn DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
     /// let mut tx = connection.begin_transaction()?;
-    /// // 执行多个操作
-    /// tx.execute("INSERT INTO accounts ...", &[])?;
-    /// tx.execute("UPDATE accounts SET ...", &[])?;
+    /// // 执行多个操作（通过 connection 执行，在事务中）
+    /// connection.execute("INSERT INTO accounts ...", &[])?;
+    /// connection.execute("UPDATE accounts SET ...", &[])?;
     /// // 提交事务
     /// tx.commit()?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # 错误
@@ -249,14 +261,15 @@ pub trait DatabaseTransaction: Send + Sync {
     ///
     /// # 示例
     ///
-    /// ```rust
-    /// match transaction.execute("UPDATE ...", &[]) {
-    ///     Ok(_) => transaction.commit()?,
-    ///     Err(e) => {
-    ///         transaction.rollback()?;
-    ///         return Err(e);
-    ///     }
-    /// }
+    /// ```rust,no_run
+    /// # use rf_contrib_drivers::DatabaseTransaction;
+    /// # fn example(mut transaction: Box<dyn DatabaseTransaction>) -> Result<(), Box<dyn std::error::Error>> {
+    /// // 如果操作成功，提交事务
+    /// // transaction.commit()?;
+    /// // 如果操作失败，回滚事务
+    /// transaction.rollback()?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # 错误

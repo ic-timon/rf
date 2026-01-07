@@ -7,6 +7,18 @@ license.workspace = true
 repository.workspace = true
 description = "RF OS module - file system, process, config, log, etc."
 
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio-test = { workspace = true }
+
+[[bench]]
+name = "cache_bench"
+harness = false
+
+[[bench]]
+name = "mutex_bench"
+harness = false
+
 [dependencies]
 tokio = { workspace = true, features = ["full"] }
 config = { workspace = true }

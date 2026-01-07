@@ -37,6 +37,7 @@
 //!     println!("从缓存获取: {:?}", data);
 //! } else {
 //!     // 执行查询后设置缓存
+//!     let result_data = b"query result data".to_vec();
 //!     cache.set("SELECT * FROM users", result_data).await;
 //! }
 //!

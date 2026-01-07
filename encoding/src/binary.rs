@@ -34,6 +34,7 @@
 //! - **小端序（Little-Endian）**: 最低有效字节在前，Intel x86 架构使用小端序
 
 use std::mem;
+use std::ptr;
 
 /// 将 i8 类型编码为字节数组
 ///
@@ -850,8 +851,12 @@ pub fn decode_f64_le(bytes: &[u8]) -> f64 {
 /// ```
 pub fn to_bytes<T: Copy>(value: T) -> Vec<u8> {
     unsafe {
-        let ptr = &value as *const T as *const u8;
         let len = mem::size_of::<T>();
-        Vec::from_raw_parts(ptr as *mut u8, len, len)
+        let mut bytes = Vec::with_capacity(len);
+        let dst_ptr = bytes.as_mut_ptr() as *mut T;
+        // 安全地复制值到新分配的Vec中
+        ptr::write(dst_ptr, value);
+        bytes.set_len(len);
+        bytes
     }
 }

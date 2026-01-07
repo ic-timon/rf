@@ -657,7 +657,7 @@ impl<T> ThreadSafeRing<T> {
     /// ```
     /// use rf_container::ThreadSafeRing;
     ///
-    /// let ring = ThreadSafeRing::new(5);
+    /// let ring: ThreadSafeRing<i32> = ThreadSafeRing::new(5);
     /// assert_eq!(ring.capacity(), 5);
     /// ```
     pub fn new(capacity: usize) -> Self {
@@ -688,7 +688,8 @@ impl<T> ThreadSafeRing<T> {
     /// ring.push(2);
     /// ```
     pub fn push(&self, value: T) -> Result<(), T> {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing::push - this should not happen in normal operation");
         buffer.push(value)
     }
 
@@ -714,7 +715,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert!(ring.try_push(3).is_err());
     /// ```
     pub fn try_push(&self, value: T) -> Result<(), T> {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.try_push(value)
     }
 
@@ -735,7 +737,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert_eq!(ring.pop(), Some(1));
     /// ```
     pub fn pop(&self) -> Option<T> {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.pop()
     }
 
@@ -759,7 +762,8 @@ impl<T> ThreadSafeRing<T> {
     where
         T: Clone,
     {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.peek().cloned()
     }
 
@@ -775,11 +779,12 @@ impl<T> ThreadSafeRing<T> {
     /// ```
     /// use rf_container::ThreadSafeRing;
     ///
-    /// let ring = ThreadSafeRing::new(3);
+    /// let ring: ThreadSafeRing<i32> = ThreadSafeRing::new(3);
     /// assert!(ring.is_empty());
     /// ```
     pub fn is_empty(&self) -> bool {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.is_empty()
     }
 
@@ -801,7 +806,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert!(ring.is_full());
     /// ```
     pub fn is_full(&self) -> bool {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.is_full()
     }
 
@@ -822,7 +828,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert_eq!(ring.len(), 2);
     /// ```
     pub fn len(&self) -> usize {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.len()
     }
 
@@ -837,11 +844,12 @@ impl<T> ThreadSafeRing<T> {
     /// ```
     /// use rf_container::ThreadSafeRing;
     ///
-    /// let ring = ThreadSafeRing::new(5);
+    /// let ring: ThreadSafeRing<i32> = ThreadSafeRing::new(5);
     /// assert_eq!(ring.capacity(), 5);
     /// ```
     pub fn capacity(&self) -> usize {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.capacity()
     }
 
@@ -858,7 +866,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert!(ring.is_empty());
     /// ```
     pub fn clear(&self) {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.clear();
     }
 
@@ -877,7 +886,8 @@ impl<T> ThreadSafeRing<T> {
     /// ring.push_batch(vec![1, 2, 3]);
     /// ```
     pub fn push_batch(&self, values: impl IntoIterator<Item = T>) {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.push_batch(values);
     }
 
@@ -902,7 +912,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert_eq!(popped, vec![1, 2, 3]);
     /// ```
     pub fn pop_batch(&self, count: usize) -> Vec<T> {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.pop_batch(count)
     }
 
@@ -931,7 +942,8 @@ impl<T> ThreadSafeRing<T> {
     where
         T: Clone,
     {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.range(start, end).into_iter().cloned().collect()
     }
 
@@ -969,7 +981,8 @@ impl<T> ThreadSafeRing<T> {
     /// assert_eq!(ring.len(), 3);
     /// ```
     pub fn resize(&self, new_capacity: usize) {
-        let mut buffer = self.inner.lock().unwrap();
+        let mut buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.resize(new_capacity);
     }
 
@@ -993,7 +1006,8 @@ impl<T> ThreadSafeRing<T> {
     where
         T: Clone + std::cmp::Ord + std::ops::Add<Output = T> + std::ops::Div<Output = T> + From<usize>,
     {
-        let buffer = self.inner.lock().unwrap();
+        let buffer = self.inner.lock()
+            .expect("Mutex poisoned in ThreadSafeRing - this should not happen in normal operation");
         buffer.stats()
     }
 }

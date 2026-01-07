@@ -281,9 +281,9 @@ impl Database {
     ///
     /// ```rust,no_run
     /// # use rf_database::db::Database;
-    /// # use serde::Deserialize;
+    /// # use sqlx::FromRow;
     /// #
-    /// # #[derive(Debug)]
+    /// # #[derive(Debug, FromRow)]
     /// # struct User {
     /// #     id: i32,
     /// #     name: String,

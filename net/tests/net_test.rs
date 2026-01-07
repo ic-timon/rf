@@ -1,6 +1,6 @@
 //! Net module tests
 
-use rf_net::{TcpClient, TcpServer, UdpSocketWrapper, RoundRobinSelector, Selector};
+use rf_net::{TcpServer, UdpSocketWrapper, RoundRobinSelector, Selector};
 
 #[tokio::test]
 async fn test_tcp_server_bind() {

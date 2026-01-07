@@ -47,7 +47,7 @@ pub use meta::*;
 pub use mode::*;
 pub use page::*;
 // Use specific imports to avoid conflicts with rand::string
-pub use rand::{int, int_range, float, float_range};
+pub use rand::{int, int_range, float, float_range, string as rand_string};
 pub use tag::*;
 pub use guid::*;
 pub use util::*;

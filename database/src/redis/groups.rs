@@ -52,7 +52,7 @@ impl StringGroup {
     /// Get and delete
     pub async fn get_del(&self, key: &str) -> Result<String> {
         let mut conn = self.connection.lock().await;
-        redis::cmd("GETDEL").arg(key).query_async::<_, String>(&mut *conn).await
+        redis::cmd("GETDEL").arg(key).query_async::<String>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis GETDEL failed: {}", e)))
     }
 
@@ -94,7 +94,7 @@ impl StringGroup {
     /// Increment by float
     pub async fn incr_by_float(&self, key: &str, increment: f64) -> Result<f64> {
         let mut conn = self.connection.lock().await;
-        redis::cmd("INCRBYFLOAT").arg(key).arg(increment).query_async::<_, f64>(&mut *conn).await
+        redis::cmd("INCRBYFLOAT").arg(key).arg(increment).query_async::<f64>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis INCRBYFLOAT failed: {}", e)))
     }
 
@@ -119,7 +119,7 @@ impl StringGroup {
         for (key, value) in pairs {
             cmd.arg(key).arg(value);
         }
-        cmd.query_async::<_, ()>(&mut *conn).await
+        cmd.query_async::<()>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis MSET failed: {}", e)))
     }
 
@@ -130,7 +130,7 @@ impl StringGroup {
         for key in keys {
             cmd.arg(key);
         }
-        cmd.query_async::<_, Vec<String>>(&mut *conn).await
+        cmd.query_async::<Vec<String>>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis MGET failed: {}", e)))
     }
 }
@@ -164,7 +164,7 @@ impl HashGroup {
         for field in fields {
             cmd.arg(field);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis HDEL failed: {}", e)))
     }
 
@@ -218,7 +218,7 @@ impl HashGroup {
         for (field, value) in pairs {
             cmd.arg(field).arg(value);
         }
-        cmd.query_async::<_, ()>(&mut *conn).await
+        cmd.query_async::<()>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis HMSET failed: {}", e)))
     }
 
@@ -230,7 +230,7 @@ impl HashGroup {
         for field in fields {
             cmd.arg(field);
         }
-        cmd.query_async::<_, Vec<String>>(&mut *conn).await
+        cmd.query_async::<Vec<String>>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis HMGET failed: {}", e)))
     }
 }
@@ -249,7 +249,7 @@ impl ListGroup {
         for value in values {
             cmd.arg(value);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis LPUSH failed: {}", e)))
     }
 
@@ -261,7 +261,7 @@ impl ListGroup {
         for value in values {
             cmd.arg(value);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis RPUSH failed: {}", e)))
     }
 
@@ -323,7 +323,7 @@ impl SetGroup {
         for member in members {
             cmd.arg(member);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis SADD failed: {}", e)))
     }
 
@@ -356,7 +356,7 @@ impl SetGroup {
         for member in members {
             cmd.arg(member);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis SREM failed: {}", e)))
     }
 }
@@ -403,7 +403,7 @@ impl SortedSetGroup {
         for member in members {
             cmd.arg(member);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis ZREM failed: {}", e)))
     }
 }
@@ -421,7 +421,7 @@ impl GenericGroup {
         for key in keys {
             cmd.arg(key);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis EXISTS failed: {}", e)))
     }
 
@@ -432,14 +432,14 @@ impl GenericGroup {
         for key in keys {
             cmd.arg(key);
         }
-        cmd.query_async::<_, usize>(&mut *conn).await
+        cmd.query_async::<usize>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis DEL failed: {}", e)))
     }
 
     /// Get key type
     pub async fn r#type(&self, key: &str) -> Result<String> {
         let mut conn = self.connection.lock().await;
-        redis::cmd("TYPE").arg(key).query_async::<_, String>(&mut *conn).await
+        redis::cmd("TYPE").arg(key).query_async::<String>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis TYPE failed: {}", e)))
     }
 
@@ -504,7 +504,7 @@ impl ScriptGroup {
         for arg in args {
             cmd.arg(arg);
         }
-        cmd.query_async::<_, redis::Value>(&mut *conn).await
+        cmd.query_async::<redis::Value>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis EVAL failed: {}", e)))
     }
 
@@ -519,14 +519,14 @@ impl ScriptGroup {
         for arg in args {
             cmd.arg(arg);
         }
-        cmd.query_async::<_, redis::Value>(&mut *conn).await
+        cmd.query_async::<redis::Value>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis EVALSHA failed: {}", e)))
     }
 
     /// Load script
     pub async fn script_load(&self, script: &str) -> Result<String> {
         let mut conn = self.connection.lock().await;
-        redis::cmd("SCRIPT").arg("LOAD").arg(script).query_async::<_, String>(&mut *conn).await
+        redis::cmd("SCRIPT").arg("LOAD").arg(script).query_async::<String>(&mut *conn).await
             .map_err(|e| RfError::Database(format!("Redis SCRIPT LOAD failed: {}", e)))
     }
 }

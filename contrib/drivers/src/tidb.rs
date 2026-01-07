@@ -34,6 +34,7 @@ use rf_errors::{Result, RfError};
 /// # 示例
 ///
 /// ```rust
+/// use rf_contrib_drivers::{tidb::TiDBDriver, DatabaseDriver};
 /// let driver = TiDBDriver::new();
 /// let name = driver.name(); // 返回 "tidb"
 /// ```
@@ -49,6 +50,7 @@ impl TiDBDriver {
     /// # 示例
     ///
     /// ```rust
+    /// use rf_contrib_drivers::tidb::TiDBDriver;
     /// let driver = TiDBDriver::new();
     /// ```
     pub fn new() -> Self {

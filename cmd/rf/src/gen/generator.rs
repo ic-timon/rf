@@ -54,11 +54,15 @@ pub enum NamingStyle {
     PascalCase,
     /// 蛇形命名法（snake_case）
     /// 例如：user_name, user_profile
-    #[allow(dead_code)]
+    /// 
+    /// Note: Currently unused, reserved for future implementation
+    #[allow(dead_code)] // Reserved for future use
     SnakeCase,
     /// 驼峰命名法（camelCase）
     /// 例如：userName, userProfile
-    #[allow(dead_code)]
+    /// 
+    /// Note: Currently unused, reserved for future implementation
+    #[allow(dead_code)] // Reserved for future use
     CamelCase,
 }
 

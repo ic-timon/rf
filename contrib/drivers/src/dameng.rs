@@ -32,6 +32,7 @@ use rf_errors::{Result, RfError};
 /// # 示例
 ///
 /// ```rust
+/// use rf_contrib_drivers::{dameng::DamengDriver, DatabaseDriver};
 /// let driver = DamengDriver::new();
 /// let name = driver.name(); // 返回 "dameng"
 /// ```
@@ -47,6 +48,7 @@ impl DamengDriver {
     /// # 示例
     ///
     /// ```rust
+    /// use rf_contrib_drivers::dameng::DamengDriver;
     /// let driver = DamengDriver::new();
     /// ```
     pub fn new() -> Self {

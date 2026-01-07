@@ -75,7 +75,7 @@ pub use udp::*;
 // Re-export with specific names to avoid conflicts
 pub use ipv4::{parse as ipv4_parse, in_network as ipv4_in_network};
 pub use ipv6::{parse as ipv6_parse, in_network as ipv6_in_network};
-// pub use sel::*; // 暂时注释，避免未使用警告
+pub use sel::*;
 pub use svc::*;
 pub use trace::*;
 pub use oai::*;

@@ -27,7 +27,7 @@
 //! # 使用示例
 //!
 //! ```rust
-//! use rframe_core::traits::ToString;
+//! use rf_core::traits::ToString;
 //!
 //! // 为自定义类型实现 ToString trait
 //! struct Person {
@@ -71,7 +71,7 @@
 //! // ## 基本实现
 //! //
 //! // ```rust
-//! // use rframe_core::traits::ToString;
+//! // use rf_core::traits::ToString;
 //! //
 //! // struct Point {
 //! //     x: i32,
@@ -91,7 +91,7 @@
 //! // ## 为枚举实现
 //! //
 //! // ```rust
-//! // use rframe_core::traits::ToString;
+//! // use rf_core::traits::ToString;
 //! //
 //! // enum Status {
 //! //     Active,
@@ -133,7 +133,7 @@ pub trait ToString {
     /// # 示例
     ///
     /// ```rust
-    /// use rframe_core::traits::ToString;
+    /// use rf_core::traits::ToString;
     ///
     /// struct User {
     ///     id: u32,
@@ -176,7 +176,7 @@ pub trait ToString {
 /// # 实现示例
 ///
 /// ```rust
-/// use rframe_core::traits::Clone;
+/// use rf_core::traits::Clone;
 ///
 /// #[derive(Clone)]
 /// struct Config {
@@ -222,9 +222,9 @@ pub trait Clone: std::clone::Clone {}
 /// # 实现示例
 ///
 /// ```rust
-/// use rframe_core::traits::Compare;
+/// use rf_core::traits::Compare;
 ///
-/// #[derive(PartialEq, Eq)]
+/// #[derive(Debug, PartialEq, Eq)]
 /// struct UserId(u32);
 ///
 /// impl Compare for UserId {} // 标记 trait，自动实现
@@ -273,16 +273,21 @@ pub trait Compare: PartialEq + Eq {}
 /// # 实现示例
 ///
 /// ```rust
-/// use rframe_core::traits::Hash;
 /// use std::collections::HashMap;
+/// use std::hash::{Hash, Hasher};
 ///
-/// #[derive(Hash, PartialEq, Eq)]
+/// #[derive(PartialEq, Eq)]
 /// struct Key {
 ///     namespace: String,
 ///     id: u32,
 /// }
 ///
-/// impl Hash for Key {} // 标记 trait，通常使用 #[derive(Hash)]
+/// impl Hash for Key {
+///     fn hash<H: Hasher>(&self, state: &mut H) {
+///         self.namespace.hash(state);
+///         self.id.hash(state);
+///     }
+/// }
 ///
 /// // 可以用作 HashMap 的键
 /// let mut map: HashMap<Key, String> = HashMap::new();

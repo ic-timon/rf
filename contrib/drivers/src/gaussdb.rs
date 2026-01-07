@@ -30,6 +30,7 @@ use rf_errors::{Result, RfError};
 /// # 示例
 ///
 /// ```rust
+/// use rf_contrib_drivers::{gaussdb::GaussDBDriver, DatabaseDriver};
 /// let driver = GaussDBDriver::new();
 /// let name = driver.name(); // 返回 "gaussdb"
 /// ```
@@ -45,6 +46,7 @@ impl GaussDBDriver {
     /// # 示例
     ///
     /// ```rust
+    /// use rf_contrib_drivers::gaussdb::GaussDBDriver;
     /// let driver = GaussDBDriver::new();
     /// ```
     pub fn new() -> Self {

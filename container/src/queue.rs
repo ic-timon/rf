@@ -21,23 +21,19 @@
 //!
 //! ```
 //! use rf_container::Queue;
-//! use std::thread;
 //!
 //! let queue = Queue::new();
 //!
-//! // 生产者线程
-//! // let queue_producer = queue.clone();
-//! // thread::spawn(move || {
-//! //     queue_producer.push(1);
-//! //     queue_producer.push(2);
-//! // });
+//! // 生产者
+//! queue.push(1);
+//! queue.push(2);
+//! queue.push(3);
 //!
-//! // 消费者线程
-//! // thread::spawn(move || {
-//! //     while let Some(value) = queue.pop() {
-//! //         println!("Got: {}", value);
-//! //     }
-//! // });
+//! // 消费者
+//! assert_eq!(queue.pop(), Some(1));
+//! assert_eq!(queue.pop(), Some(2));
+//! assert_eq!(queue.pop(), Some(3));
+//! assert_eq!(queue.pop(), None);
 //! ```
 
 use crossbeam::queue::SegQueue;

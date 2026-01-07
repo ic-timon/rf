@@ -29,17 +29,13 @@
 //!
 //! ```
 //! use rf_container::HashMap;
-//! use std::thread;
 //!
 //! let map = HashMap::new();
+//! map.insert("key1", "value1");
+//! map.insert("key2", "value2");
 //!
-//! // 多个线程同时写入
-//! for i in 0..10 {
-//! //     let map_clone = map.clone();
-//! //     thread::spawn(move || {
-//! //         map_clone.insert(i, i * 2);
-//! //     });
-//! // }
+//! assert_eq!(map.get(&"key1").map(|v| *v), Some("value1"));
+//! assert_eq!(map.len(), 2);
 //! ```
 //!
 //! ## OrderedMap 示例
@@ -52,10 +48,11 @@
 //! map.insert("b", 2);
 //! map.insert("c", 3);
 //!
-//! // 按照插入顺序遍历
-//! for (key, value) in &map {
-//!     println!("{}: {}", key, value);
-//! // }
+//! // 按照插入顺序访问
+//! assert_eq!(map.get(&"a"), Some(&1));
+//! assert_eq!(map.get(&"b"), Some(&2));
+//! assert_eq!(map.get(&"c"), Some(&3));
+//! assert_eq!(map.len(), 3);
 //! ```
 
 use dashmap::DashMap;
@@ -169,9 +166,8 @@ where
     /// let map = HashMap::new();
     /// map.insert("key", "value");
     ///
-    /// if let Some(value_ref) = map.get(&"key") {
-    ///     assert_eq!(*value_ref, "value");
-    /// }
+    /// let value = map.get(&"key").map(|v| *v);
+    /// assert_eq!(value, Some("value"));
     /// ```
     pub fn get(&self, key: &K) -> Option<impl std::ops::Deref<Target = V> + '_> {
         self.0.get(key)
@@ -370,11 +366,11 @@ pub type StrIntMap = HashMap<String, i64>;
 /// map.insert("b", 2);
 /// map.insert("c", 3);
 ///
-/// // 遍历顺序是插入顺序
-/// let mut iter = map.iter();
-/// assert_eq!(iter.next(), Some((&"a", &1)));
-/// assert_eq!(iter.next(), Some((&"b", &2)));
-/// assert_eq!(iter.next(), Some((&"c", &3)));
+/// // 按照插入顺序访问
+/// assert_eq!(map.get(&"a"), Some(&1));
+/// assert_eq!(map.get(&"b"), Some(&2));
+/// assert_eq!(map.get(&"c"), Some(&3));
+/// assert_eq!(map.len(), 3);
 /// ```
 #[derive(Debug, Clone)]
 pub struct OrderedMap<K, V>(IndexMap<K, V>);

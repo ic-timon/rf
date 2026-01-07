@@ -36,6 +36,7 @@ use rf_errors::{Result, RfError};
 /// # 示例
 ///
 /// ```rust
+/// use rf_contrib_drivers::{oracle::OracleDriver, DatabaseDriver};
 /// let driver = OracleDriver::new();
 /// let name = driver.name(); // 返回 "oracle"
 /// ```
@@ -51,6 +52,7 @@ impl OracleDriver {
     /// # 示例
     ///
     /// ```rust
+    /// use rf_contrib_drivers::oracle::OracleDriver;
     /// let driver = OracleDriver::new();
     /// ```
     pub fn new() -> Self {

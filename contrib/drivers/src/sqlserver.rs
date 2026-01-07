@@ -35,6 +35,7 @@ use rf_errors::{Result, RfError};
 /// # 示例
 ///
 /// ```rust
+/// use rf_contrib_drivers::{sqlserver::SqlServerDriver, DatabaseDriver};
 /// let driver = SqlServerDriver::new();
 /// let name = driver.name(); // 返回 "sqlserver"
 /// ```
@@ -50,6 +51,7 @@ impl SqlServerDriver {
     /// # 示例
     ///
     /// ```rust
+    /// use rf_contrib_drivers::sqlserver::SqlServerDriver;
     /// let driver = SqlServerDriver::new();
     /// ```
     pub fn new() -> Self {

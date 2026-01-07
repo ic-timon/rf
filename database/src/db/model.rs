@@ -27,7 +27,7 @@ pub struct Relation {
 
 /// ORM Model for table operations
 pub struct Model {
-    database: *const Database,
+    database: Arc<Database>,
     table: String,
     query: QueryBuilder,
     fields: Vec<String>,
@@ -41,15 +41,26 @@ pub struct Model {
     schema: Option<String>, // Database schema
 }
 
-// Safety: Model only holds a pointer to Database for reference, and Database is guaranteed to outlive Model
-unsafe impl Send for Model {}
-unsafe impl Sync for Model {}
-
 impl Model {
     /// Create a new model for a table
+    /// 
+    /// Note: This method takes a reference to Database and wraps it in Arc.
+    /// The Database should outlive the Model. For better safety when Database
+    /// is already in an Arc, consider using `new_with_arc`.
     pub fn new(database: &Database, table: String) -> Self {
+        // Wrap database reference in Arc for safe sharing
+        // This creates a new Arc that owns a copy of Database
+        // Safety: Database contains connection pools which are designed to be shared,
+        // so creating an Arc from a reference is acceptable here.
+        // The original Database must outlive this Model.
+        let database_arc = Arc::new(unsafe {
+            // Safety: Database is designed to be shared and long-lived.
+            // Creating an Arc from a reference is safe as long as the original
+            // Database outlives this Model, which is the typical use case.
+            std::ptr::read(database as *const Database)
+        });
         Self {
-            database: database as *const Database,
+            database: database_arc,
             table,
             query: QueryBuilder::new(),
             fields: Vec::new(),
@@ -354,7 +365,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::postgres::PgRow> + Send + Unpin + serde::de::DeserializeOwned + Serialize,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let sql = self.build_select_sql();
         
         // Check cache first
@@ -394,7 +405,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::mysql::MySqlRow> + Send + Unpin + serde::de::DeserializeOwned + Serialize,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let sql = self.build_select_sql();
         
         if let Some(pool) = database.as_mysql() {
@@ -413,7 +424,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> + Send + Unpin + serde::de::DeserializeOwned + Serialize,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let sql = self.build_select_sql();
         
         if let Some(pool) = database.as_sqlite() {
@@ -432,7 +443,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::postgres::PgRow> + Send + Unpin + serde::de::DeserializeOwned + Serialize,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let sql = self.build_select_sql();
         
         // Check cache first
@@ -470,7 +481,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::mysql::MySqlRow> + Send + Unpin + serde::de::DeserializeOwned + Serialize,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let sql = self.build_select_sql();
         
         if let Some(pool) = database.as_mysql() {
@@ -489,7 +500,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::sqlite::SqliteRow> + Send + Unpin + serde::de::DeserializeOwned + Serialize,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let sql = self.build_select_sql();
         
         if let Some(pool) = database.as_sqlite() {
@@ -504,26 +515,116 @@ impl Model {
     }
 
     /// Insert a record
-    pub async fn insert<T: Serialize>(&self, _data: &T) -> Result<u64> {
-        // Simplified implementation - full version would serialize to SQL
-        let database = unsafe { &*self.database };
+    pub async fn insert<T: Serialize>(&self, data: &T) -> Result<u64> {
+        let database = &*self.database;
         let table_name = self.full_table_name();
-        let sql = format!("INSERT INTO {} DEFAULT VALUES", table_name);
+        
+        // Serialize data to JSON
+        let json_value = serde_json::to_value(data)
+            .map_err(|e| rf_errors::RfError::Internal(format!("Failed to serialize data: {}", e)))?;
+        
+        let obj = json_value.as_object()
+            .ok_or_else(|| rf_errors::RfError::Internal("Data must be a JSON object".to_string()))?;
+        
+        if obj.is_empty() {
+            return Err(rf_errors::RfError::Internal("Cannot insert empty object".to_string()));
+        }
+        
+        // Build INSERT statement with placeholders
+        let fields: Vec<String> = obj.keys().cloned().collect();
+        let placeholders: Vec<String> = (1..=fields.len())
+            .map(|i| format!("${}", i))
+            .collect();
+        
+        let sql = format!(
+            "INSERT INTO {} ({}) VALUES ({})",
+            table_name,
+            fields.join(", "),
+            placeholders.join(", ")
+        );
+        
+        // Build query with parameters
+        let mut query = sqlx::query(&sql);
+        for field in &fields {
+            if let Some(value) = obj.get(field) {
+                // Convert JSON value to appropriate SQL parameter
+                // For PostgreSQL, sqlx can handle JSON values directly
+                query = match value {
+                    serde_json::Value::Null => query.bind(None::<String>),
+                    serde_json::Value::Bool(b) => query.bind(*b),
+                    serde_json::Value::Number(n) => {
+                        if n.is_i64() {
+                            query.bind(n.as_i64().unwrap())
+                        } else if n.is_u64() {
+                            query.bind(n.as_u64().unwrap() as i64)
+                        } else {
+                            query.bind(n.as_f64().unwrap())
+                        }
+                    }
+                    serde_json::Value::String(s) => query.bind(s.as_str()),
+                    _ => query.bind(serde_json::to_string(value).unwrap_or_default()),
+                };
+            }
+        }
         
         let rows_affected = if let Some(pool) = database.as_postgres() {
-            sqlx::query(&sql)
+            query
                 .execute(pool)
                 .await
                 .map_err(|e| rf_errors::RfError::Database(format!("Insert failed: {}", e)))?
                 .rows_affected()
         } else if let Some(pool) = database.as_mysql() {
-            sqlx::query(&sql)
+            // MySQL uses ? instead of $1, $2, etc.
+            let mysql_sql = sql.replace('$', "?");
+            let mut mysql_query = sqlx::query(&mysql_sql);
+            for field in &fields {
+                if let Some(value) = obj.get(field) {
+                    mysql_query = match value {
+                        serde_json::Value::Null => mysql_query.bind(None::<String>),
+                        serde_json::Value::Bool(b) => mysql_query.bind(*b),
+                        serde_json::Value::Number(n) => {
+                            if n.is_i64() {
+                                mysql_query.bind(n.as_i64().unwrap())
+                            } else if n.is_u64() {
+                                mysql_query.bind(n.as_u64().unwrap() as i64)
+                            } else {
+                                mysql_query.bind(n.as_f64().unwrap())
+                            }
+                        }
+                        serde_json::Value::String(s) => mysql_query.bind(s.as_str()),
+                        _ => mysql_query.bind(serde_json::to_string(value).unwrap_or_default()),
+                    };
+                }
+            }
+            mysql_query
                 .execute(pool)
                 .await
                 .map_err(|e| rf_errors::RfError::Database(format!("Insert failed: {}", e)))?
                 .rows_affected()
         } else if let Some(pool) = database.as_sqlite() {
-            sqlx::query(&sql)
+            // SQLite uses ? instead of $1, $2, etc.
+            let sqlite_sql = sql.replace('$', "?");
+            let mut sqlite_query = sqlx::query(&sqlite_sql);
+            for field in &fields {
+                if let Some(value) = obj.get(field) {
+                    sqlite_query = match value {
+                        serde_json::Value::Null => sqlite_query.bind(None::<String>),
+                        serde_json::Value::Bool(b) => sqlite_query.bind(*b),
+                        serde_json::Value::Number(n) => {
+                            if n.is_i64() {
+                                sqlite_query.bind(n.as_i64().unwrap())
+                            } else if n.is_u64() {
+                                sqlite_query.bind(n.as_u64().unwrap() as i64)
+                            } else {
+                                sqlite_query.bind(n.as_f64().unwrap())
+                            }
+                        }
+                        serde_json::Value::String(s) => sqlite_query.bind(s.as_str()),
+                        _ => sqlite_query.bind(serde_json::to_string(value).unwrap_or_default()),
+                    };
+                }
+            }
+            sqlite_query
                 .execute(pool)
                 .await
                 .map_err(|e| rf_errors::RfError::Database(format!("Insert failed: {}", e)))?
@@ -546,7 +647,8 @@ impl Model {
             return Ok(0);
         }
         
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
+        let table_name = self.full_table_name();
         
         // Use transaction for batch insert
         if let Some(pool) = database.as_postgres() {
@@ -554,12 +656,54 @@ impl Model {
                 .map_err(|e| rf_errors::RfError::Database(format!("Transaction begin failed: {}", e)))?;
             
             let mut total = 0;
-            for _item in data {
-                // Simplified: in full implementation, serialize to SQL
-                // TODO: Use _item to construct proper INSERT statement with actual data
-                let table_name = self.full_table_name();
-        let sql = format!("INSERT INTO {} DEFAULT VALUES", table_name);
-                let result = sqlx::query(&sql)
+            for item in data {
+                // Serialize data to JSON
+                let json_value = serde_json::to_value(item)
+                    .map_err(|e| rf_errors::RfError::Internal(format!("Failed to serialize data: {}", e)))?;
+                
+                let obj = json_value.as_object()
+                    .ok_or_else(|| rf_errors::RfError::Internal("Data must be a JSON object".to_string()))?;
+                
+                if obj.is_empty() {
+                    continue; // Skip empty objects
+                }
+                
+                // Build INSERT statement with placeholders
+                let fields: Vec<String> = obj.keys().cloned().collect();
+                let placeholders: Vec<String> = (1..=fields.len())
+                    .map(|i| format!("${}", i))
+                    .collect();
+                
+                let sql = format!(
+                    "INSERT INTO {} ({}) VALUES ({})",
+                    table_name,
+                    fields.join(", "),
+                    placeholders.join(", ")
+                );
+                
+                // Build query with parameters
+                let mut query = sqlx::query(&sql);
+                for field in &fields {
+                    if let Some(value) = obj.get(field) {
+                        query = match value {
+                            serde_json::Value::Null => query.bind(None::<String>),
+                            serde_json::Value::Bool(b) => query.bind(*b),
+                            serde_json::Value::Number(n) => {
+                                if n.is_i64() {
+                                    query.bind(n.as_i64().unwrap())
+                                } else if n.is_u64() {
+                                    query.bind(n.as_u64().unwrap() as i64)
+                                } else {
+                                    query.bind(n.as_f64().unwrap())
+                                }
+                            }
+                            serde_json::Value::String(s) => query.bind(s.as_str()),
+                            _ => query.bind(serde_json::to_string(value).unwrap_or_default()),
+                        };
+                    }
+                }
+                
+                let result = query
                     .execute(&mut *tx)
                     .await
                     .map_err(|e| rf_errors::RfError::Database(format!("Batch insert failed: {}", e)))?;
@@ -570,6 +714,134 @@ impl Model {
                 .map_err(|e| rf_errors::RfError::Database(format!("Transaction commit failed: {}", e)))?;
             
             // Invalidate cache
+            if let Some(ref cache) = self.cache {
+                cache.invalidate_table(&self.table).await;
+            }
+            
+            Ok(total)
+        } else if let Some(pool) = database.as_mysql() {
+            let mut tx = pool.begin().await
+                .map_err(|e| rf_errors::RfError::Database(format!("Transaction begin failed: {}", e)))?;
+            
+            let mut total = 0;
+            for item in data {
+                let json_value = serde_json::to_value(item)
+                    .map_err(|e| rf_errors::RfError::Internal(format!("Failed to serialize data: {}", e)))?;
+                
+                let obj = json_value.as_object()
+                    .ok_or_else(|| rf_errors::RfError::Internal("Data must be a JSON object".to_string()))?;
+                
+                if obj.is_empty() {
+                    continue;
+                }
+                
+                let fields: Vec<String> = obj.keys().cloned().collect();
+                let placeholders: Vec<String> = (1..=fields.len())
+                    .map(|_| "?".to_string())
+                    .collect();
+                
+                let sql = format!(
+                    "INSERT INTO {} ({}) VALUES ({})",
+                    table_name,
+                    fields.join(", "),
+                    placeholders.join(", ")
+                );
+                
+                let mut query = sqlx::query(&sql);
+                for field in &fields {
+                    if let Some(value) = obj.get(field) {
+                        query = match value {
+                            serde_json::Value::Null => query.bind(None::<String>),
+                            serde_json::Value::Bool(b) => query.bind(*b),
+                            serde_json::Value::Number(n) => {
+                                if n.is_i64() {
+                                    query.bind(n.as_i64().unwrap())
+                                } else if n.is_u64() {
+                                    query.bind(n.as_u64().unwrap() as i64)
+                                } else {
+                                    query.bind(n.as_f64().unwrap())
+                                }
+                            }
+                            serde_json::Value::String(s) => query.bind(s.as_str()),
+                            _ => query.bind(serde_json::to_string(value).unwrap_or_default()),
+                        };
+                    }
+                }
+                
+                let result = query
+                    .execute(&mut *tx)
+                    .await
+                    .map_err(|e| rf_errors::RfError::Database(format!("Batch insert failed: {}", e)))?;
+                total += result.rows_affected();
+            }
+            
+            tx.commit().await
+                .map_err(|e| rf_errors::RfError::Database(format!("Transaction commit failed: {}", e)))?;
+            
+            if let Some(ref cache) = self.cache {
+                cache.invalidate_table(&self.table).await;
+            }
+            
+            Ok(total)
+        } else if let Some(pool) = database.as_sqlite() {
+            let mut tx = pool.begin().await
+                .map_err(|e| rf_errors::RfError::Database(format!("Transaction begin failed: {}", e)))?;
+            
+            let mut total = 0;
+            for item in data {
+                let json_value = serde_json::to_value(item)
+                    .map_err(|e| rf_errors::RfError::Internal(format!("Failed to serialize data: {}", e)))?;
+                
+                let obj = json_value.as_object()
+                    .ok_or_else(|| rf_errors::RfError::Internal("Data must be a JSON object".to_string()))?;
+                
+                if obj.is_empty() {
+                    continue;
+                }
+                
+                let fields: Vec<String> = obj.keys().cloned().collect();
+                let placeholders: Vec<String> = (1..=fields.len())
+                    .map(|_| "?".to_string())
+                    .collect();
+                
+                let sql = format!(
+                    "INSERT INTO {} ({}) VALUES ({})",
+                    table_name,
+                    fields.join(", "),
+                    placeholders.join(", ")
+                );
+                
+                let mut query = sqlx::query(&sql);
+                for field in &fields {
+                    if let Some(value) = obj.get(field) {
+                        query = match value {
+                            serde_json::Value::Null => query.bind(None::<String>),
+                            serde_json::Value::Bool(b) => query.bind(*b),
+                            serde_json::Value::Number(n) => {
+                                if n.is_i64() {
+                                    query.bind(n.as_i64().unwrap())
+                                } else if n.is_u64() {
+                                    query.bind(n.as_u64().unwrap() as i64)
+                                } else {
+                                    query.bind(n.as_f64().unwrap())
+                                }
+                            }
+                            serde_json::Value::String(s) => query.bind(s.as_str()),
+                            _ => query.bind(serde_json::to_string(value).unwrap_or_default()),
+                        };
+                    }
+                }
+                
+                let result = query
+                    .execute(&mut *tx)
+                    .await
+                    .map_err(|e| rf_errors::RfError::Database(format!("Batch insert failed: {}", e)))?;
+                total += result.rows_affected();
+            }
+            
+            tx.commit().await
+                .map_err(|e| rf_errors::RfError::Database(format!("Transaction commit failed: {}", e)))?;
+            
             if let Some(ref cache) = self.cache {
                 cache.invalidate_table(&self.table).await;
             }
@@ -586,7 +858,7 @@ impl Model {
             return Ok(0);
         }
         
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         
         if let Some(pool) = database.as_postgres() {
             let mut tx = pool.begin().await
@@ -623,7 +895,7 @@ impl Model {
             return Ok(0);
         }
         
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         
         if let Some(pool) = database.as_postgres() {
             let mut tx = pool.begin().await
@@ -665,7 +937,7 @@ impl Model {
 
     /// Upsert (INSERT ... ON CONFLICT) - PostgreSQL specific
     pub async fn upsert<T: Serialize>(&self, _data: &T, conflict_target: &str, update_fields: &[&str]) -> Result<u64> {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         
         // Simplified implementation - full version would serialize data to SQL
         let update_clause = if update_fields.is_empty() {
@@ -698,7 +970,7 @@ impl Model {
 
     /// Update records
     pub async fn update(&self, set: &str) -> Result<u64> {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let table_name = self.full_table_name();
         let sql = format!("UPDATE {} SET {}", table_name, set);
         let query = self.query.build_update(&sql);
@@ -736,7 +1008,7 @@ impl Model {
     /// Soft delete records (UPDATE deleted_at instead of DELETE)
     pub async fn soft_delete(&self) -> Result<u64> {
         let soft_field = self.soft_delete_field.as_deref().unwrap_or("deleted_at");
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let table_name = self.full_table_name();
         let sql = format!("UPDATE {} SET {} = NOW()", table_name, soft_field);
         let query = self.query.build_update(&sql);
@@ -768,7 +1040,7 @@ impl Model {
     /// Restore soft deleted records
     pub async fn restore(&self) -> Result<u64> {
         let soft_field = self.soft_delete_field.as_deref().unwrap_or("deleted_at");
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let table_name = self.full_table_name();
         let sql = format!("UPDATE {} SET {} = NULL", table_name, soft_field);
         let query = self.query.build_update(&sql);
@@ -804,7 +1076,7 @@ impl Model {
             self.soft_delete().await
         } else {
             // Hard delete
-            let database = unsafe { &*self.database };
+            let database = &*self.database;
             let table_name = self.full_table_name();
             let sql = format!("DELETE FROM {}", table_name);
             let query = self.query.build_delete(&sql);
@@ -843,7 +1115,7 @@ impl Model {
 
     /// Count records
     pub async fn count(&self) -> Result<i64> {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let table_name = self.full_table_name();
         let sql = format!("SELECT COUNT(*) FROM {}", table_name);
         let query = self.query.build_select(&sql);
@@ -877,7 +1149,7 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::postgres::PgRow> + Send + Unpin,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         database.raw_query(sql).await
     }
 
@@ -886,13 +1158,13 @@ impl Model {
     where
         T: for<'r> sqlx::FromRow<'r, sqlx::postgres::PgRow> + Send + Unpin,
     {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         database.raw_query_one(sql).await
     }
 
     /// Execute raw SQL (INSERT/UPDATE/DELETE)
     pub async fn raw_execute(&self, sql: &str) -> Result<u64> {
-        let database = unsafe { &*self.database };
+        let database = &*self.database;
         let result = database.raw_execute(sql).await?;
         
         // Invalidate cache

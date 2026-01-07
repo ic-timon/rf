@@ -90,7 +90,7 @@ impl TransactionWrapper {
     /// # use rf_database::db::transaction::TransactionWrapper;
     /// #
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let mut tx = unsafe { std::mem::zeroed() };
+    /// # let mut tx: TransactionWrapper = unsafe { std::mem::zeroed() };
     /// // 更新用户余额
     /// tx.execute("UPDATE users SET balance = balance - 100 WHERE id = 1").await?;
     /// # Ok(())
@@ -121,7 +121,7 @@ impl TransactionWrapper {
     /// # use rf_database::db::transaction::TransactionWrapper;
     /// #
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let mut tx = unsafe { std::mem::zeroed() };
+    /// # let mut tx: TransactionWrapper = unsafe { std::mem::zeroed() };
     /// // 所有操作成功后提交
     /// tx.commit().await?;
     /// # Ok(())
@@ -152,7 +152,7 @@ impl TransactionWrapper {
     /// # use rf_database::db::transaction::TransactionWrapper;
     /// #
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let mut tx = unsafe { std::mem::zeroed() };
+    /// # let mut tx: TransactionWrapper = unsafe { std::mem::zeroed() };
     /// // 发生错误时回滚
     /// tx.rollback().await?;
     /// # Ok(())
